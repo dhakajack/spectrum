@@ -21,6 +21,16 @@ const int SCALE[4][6] = {
   {0,1,4,16,64,256} //12dB (84 dB range)
 };
 
+byte mode = 0; 
+/* set by 2-position dip switch
+RANGE_HI RANGE_LO   mode    SCALE
+0        0          0       linear  
+0        1          1       3dB
+1        0          2       6dB
+1        1          3       12dB
+*/
+
+
 void setup() {
   for (int x=0; x < 7; x++) {
     pinMode(LED_COL[x],OUTPUT);
@@ -34,8 +44,14 @@ void setup() {
   pinMode(MSG_STROBE,OUTPUT);
   pinMode(RANGE_HI,INPUT_PULLUP);
   pinMode(RANGE_LO,INPUT_PULLUP);
+  
+  // initialize MSGEQ7
   digitalWrite(MSG_RESET, LOW);
   digitalWrite(MSG_STROBE, HIGH);
+  
+  // set meter scale; presumably, done once at power up
+  mode |= (digitalRead(RANGE_HI) << 2);
+  mode |= digitalRead(RANGE_LO);
 }
 
 void loop() {
