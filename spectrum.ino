@@ -7,10 +7,19 @@
 #define MSG_RESET 18
 #define MSG_STROBE 17
 #define MSG_SAMPLE 0
+#define RANGE_HI 16
+#define RANGE_LO 15
 
 const int LED_COL[7] = {0,1,2,3,4,5,6};
 const int LED_ROW[8] = {19,13,12,11,10,9,8,7};
 const int NOISE_THRESHOLD = 50;
+const int WARNING = 1000;
+const int SCALE[4][6] = {
+  {128,256,384,512,640,768}, // linear
+  {128,181,256,362,512,724}, // 3dB increments (21dB range)
+  {16,32,64,128,256,512}, // 6dB (42 dB range)
+  {0,1,4,16,64,256} //12dB (84 dB range)
+};
 
 void setup() {
   for (int x=0; x < 7; x++) {
@@ -23,6 +32,8 @@ void setup() {
   }
   pinMode(MSG_RESET,OUTPUT);
   pinMode(MSG_STROBE,OUTPUT);
+  pinMode(RANGE_HI,INPUT_PULLUP);
+  pinMode(RANGE_LO,INPUT_PULLUP);
   digitalWrite(MSG_RESET, LOW);
   digitalWrite(MSG_STROBE, HIGH);
 }
