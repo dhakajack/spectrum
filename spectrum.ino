@@ -64,13 +64,33 @@ void loop() {
      digitalWrite(MSG_STROBE, LOW);
      delayMicroseconds(35); // allow value to settle
      spectrumRead = analogRead(MSG_SAMPLE);
-     if (spectrumRead > NOISE_THRESHOLD) {
-       topBar = spectrumRead / 128;
+     
+     if (spectrumRead > NOISE_THRESHOLD) {  // if nothing registers above, nothing to display
+     
+       // figure out how many LEDs to light up in a given band
+       if (spectrumRead > WARNING) { 
+         topBar = 7;
+       } else {
+         topBar = 1;
+         for (int y = 0; y < 6; y++) {
+           if (spectrumRead > SCALE[mode][y] + NOISE_THRESHOLD ) {
+             topBar++;
+           } else {
+             break;
+           }
+         } 
+       }
+
+      // turn LEDs on in a band
        digitalWrite(LED_COL[band],HIGH);
        for (int y = 0; y < topBar + 1; y++) {
          digitalWrite(LED_ROW[y], LOW);
        }
-       delay(1); // persistance of vision delay; adjust to taste
+       
+       // persistance of vision delay; adjust to taste
+       delay(1); 
+       
+       // turn LEDs off in a band
        digitalWrite(LED_COL[band],LOW);
        for (int y = 0; y < topBar + 1; y++) {
          digitalWrite(LED_ROW[y],HIGH);
