@@ -12,7 +12,7 @@
 
 const int LED_COL[7] = {0,1,2,3,4,5,6};
 const int LED_ROW[8] = {19,13,12,11,10,9,8,7};
-const int NOISE_THRESHOLD = 50;
+const int NOISE_THRESHOLD = 65;
 const int WARNING = 1000;
 const int SCALE[4][6] = {
   {128,256,384,512,640,768}, // linear
@@ -50,8 +50,7 @@ void setup() {
   digitalWrite(MSG_STROBE, HIGH);
   
   // set meter scale; presumably, done once at power up
-  mode |= (digitalRead(RANGE_HI) << 2);
-  mode |= digitalRead(RANGE_LO);
+  mode = digitalRead(RANGE_HI)*2 + digitalRead(RANGE_LO);
 }
 
 void loop() {
@@ -66,16 +65,14 @@ void loop() {
      spectrumRead = analogRead(MSG_SAMPLE);
      
      if (spectrumRead > NOISE_THRESHOLD) {  // if nothing registers above, nothing to display
-     
        // figure out how many LEDs to light up in a given band
        if (spectrumRead > WARNING) { 
          topBar = 7;
        } else {
-         topBar = 1;
-         for (int y = 0; y < 6; y++) {
-           if (spectrumRead > SCALE[mode][y] + NOISE_THRESHOLD ) {
-             topBar++;
-           } else {
+         topBar = 0;
+         for (int y = 5; y > -1; y--) {
+           if (spectrumRead >= SCALE[mode][y] + NOISE_THRESHOLD ) {
+             topBar = y + 1;
              break;
            }
          } 
@@ -88,7 +85,7 @@ void loop() {
        }
        
        // persistance of vision delay; adjust to taste
-       delay(1); 
+       delay(2); // above 2 ms, flickery; for finer adjust, use delayMicroseconds()
        
        // turn LEDs off in a band
        digitalWrite(LED_COL[band],LOW);
