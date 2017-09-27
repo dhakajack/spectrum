@@ -87,8 +87,7 @@ void setup() {
     mode += 1;
   }
   
-  noiseThreshold = 60;
-  // noiseThreshold = setThreshold(); [TODO: Uncomment]
+  noiseThreshold = setThreshold(); 
 }
 
 void loop() {
